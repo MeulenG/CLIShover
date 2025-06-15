@@ -1,0 +1,5 @@
+C:/Users/Molle/Desktop/CLIShover/CLIShover/obj/Debug/net8.0/CLIShover.GeneratedMSBuildEditorConfig.editorconfig
+C:/Users/Molle/Desktop/CLIShover/CLIShover/obj/Debug/net8.0/CLIShover.AssemblyInfoInputs.cache
+C:/Users/Molle/Desktop/CLIShover/CLIShover/obj/Debug/net8.0/CLIShover.AssemblyInfo.cs
+C:/Users/Molle/Desktop/CLIShover/CLIShover/obj/Debug/net8.0/CLIShover.csproj.CoreCompileInputs.cache
+C:/Users/Molle/Desktop/CLIShover/CLIShover/obj/Debug/net8.0/CLIShover.sourcelink.json
