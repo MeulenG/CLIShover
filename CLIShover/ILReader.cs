@@ -49,14 +49,14 @@ namespace CLIShover
                     opcode = SingleByteOpCodes[code];
                 }
 
-                object operand = ReadOperand(il, ref pos, opcode.OperandType);
+                object? operand = ReadOperand(il, ref pos, opcode.OperandType);
                 instructions.Add(new ILInstruction { Offset = offset, OpCode = opcode, Operand = operand });
             }
 
             return instructions;
         }
 
-        private static object ReadOperand(byte[] il, ref int pos, OperandType type)
+        private static object? ReadOperand(byte[] il, ref int pos, OperandType type)
         {
             switch (type)
             {
