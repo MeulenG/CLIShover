@@ -6,6 +6,6 @@ namespace CLIShover
     {
         public int Offset { get; set; }
         public OpCode OpCode { get; set; }
-        public object Operand { get; set; }
+        public object? Operand { get; set; }
     }
 }
