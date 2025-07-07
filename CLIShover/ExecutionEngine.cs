@@ -31,12 +31,6 @@ namespace CLIShover
                     }
                     Console.WriteLine($"Disassembling {type.FullName}.{method.Name}");
 
-                    if (method.Name == "Main")
-                    {
-                        // Create a label for the method
-                        context.AddLabel("_start");
-                    }
-
                     var instructions = ILReader.ReadInstructions(method);
                     var body = method.GetMethodBody();
                     int localVarCount = body?.LocalVariables.Count ?? 0;
@@ -44,17 +38,10 @@ namespace CLIShover
                     // Initialize stack frame
                     context.WriteLine($"push rbp");
                     context.WriteLine($"mov rbp, rsp");
-                    context.WriteLine($"sub rsp, {stackSize}"); // Allocate space for local variables
+                    context.WriteLine($"sub rsp, {stackSize}");
 
                     foreach (var instr in instructions)
                     {
-                        if (method.Name == "Main" && instr.OpCode.Name == "ret")
-                        {
-                            context.WriteLine("mov rax, 60");
-                            context.WriteLine("xor rdi, rdi");
-                            context.WriteLine("syscall");
-                            continue;
-                        }
                         // Label handling (if any jumps point to this offset)
                         if (context.Labels.TryGetValue(instr.Offset, out var label))
                             context.Output.AppendLine($"{label}:");
