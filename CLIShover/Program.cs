@@ -6,7 +6,7 @@
         {
             ExecutionEngine engine = new ExecutionEngine();
             // Test File
-            engine.Execute("/mnt/c/Users/Molle/Desktop/CLIShover/CLIShover/Test-Data/Test.dll");
+            engine.Execute("/mnt/c/Users/Molle/Desktop/CLIShover/CLIShover/Test-Data/HelloWorldOS.dll");
         }
 
     }

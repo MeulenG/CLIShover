@@ -19,24 +19,6 @@ namespace CLIShover
             var asm = Assembly.LoadFile(filePath);
             Console.WriteLine("IL → NASM translator");
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                Console.WriteLine("Running on Windows. Ensure you have NASM installed and available in your PATH.");
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                Console.WriteLine("Running on Linux. Ensure you have NASM installed and available in your PATH.");
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                Console.WriteLine("Running on macOS. Ensure you have NASM installed and available in your PATH.");
-            }
-            else
-            {
-                Console.WriteLine("Unsupported OS. This tool currently supports Windows, Linux, and macOS.");
-                return;
-            }
-
             var emitters = InstructionEmitterRegistry.Create();
             var context = new EmitterContext();
             context.WriteLine("global main");
@@ -66,8 +48,17 @@ namespace CLIShover
                     context.WriteLine($"mov rbp, rsp");
                     context.WriteLine($"sub rsp, {stackSize}");
 
+                    int instrucCount = instructions.Count();
+
                     foreach (var instr in instructions)
                     {
+                        instrucCount--;
+                        if (instrucCount == 0)
+                        {
+                            // Finalize stack frame
+                            context.WriteLine($"mov rsp, rbp");
+                            context.WriteLine($"pop rbp");
+                        }
                         // Label handling (if any jumps point to this offset)
                         if (context.Labels.TryGetValue(instr.Offset, out var label))
                             context.Output.AppendLine($"{label}:");
