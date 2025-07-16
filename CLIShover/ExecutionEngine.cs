@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Diagnostics.Tracing;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Reflection.Emit;
 
 namespace CLIShover
 {
@@ -39,6 +40,7 @@ namespace CLIShover
                         // Create a label for the method
                         context.AddLabel("main");
                     }
+                    context.currentMethodName = method.Name;
                     var instructions = ILReader.ReadInstructions(method);
                     var body = method.GetMethodBody();
                     int localVarCount = body?.LocalVariables.Count ?? 0;

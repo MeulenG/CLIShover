@@ -34,7 +34,6 @@ namespace CLIShover
                 { OpCodes.Ldloc_1,  new ILOpCodes.Ldloc_N_Emitter() },
                 { OpCodes.Ldarg_0,  new ILOpCodes.Ldarg_0_Emitter() },
                 { OpCodes.Call,     new ILOpCodes.Call_Emitter() },
-                { OpCodes.Stloc_2,  new ILOpCodes.Stloc_N_Emitter() },
                 { OpCodes.Ldloc_2,  new ILOpCodes.Ldloc_N_Emitter() },
                 { OpCodes.Ldloc_3,  new ILOpCodes.Ldloc_N_Emitter() },
                 { OpCodes.Callvirt, new ILOpCodes.Callvirt_Emitter() },
