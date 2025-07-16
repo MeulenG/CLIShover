@@ -4,7 +4,7 @@ namespace CLIShover.ILOpCodes
     {
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
-            ctx.WriteLine("call ");
+            ctx.WriteLine($"call {ctx.currentMethodName}");
         }
     }
 }

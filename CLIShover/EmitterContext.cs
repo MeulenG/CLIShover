@@ -11,6 +11,8 @@ namespace CLIShover
         public Dictionary<int, string> Labels { get; } = new(); // IL offset → label
         public Stack<string> EvaluationStack { get; } = new();   // Simulated eval stack
         public int LabelCounter { get; set; } = 0;
+
+        public string currentMethodName = string.Empty;
         
         public void WriteLine(string line)
         {
@@ -26,13 +28,6 @@ namespace CLIShover
         {
             Output.AppendLine($"{methodName}:");
         }
-
-        // Call needs method name
-        public string returnMethodName(string methodName)
-        {
-            return methodName;
-        }
-
         public override string ToString() => Output.ToString();
     }
 
