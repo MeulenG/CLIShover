@@ -1,10 +1,11 @@
 namespace CLIShover.ILOpCodes
 {
-    public class Ldarg_0_Emitter : Interfaces.IEmitter
+    public class Conv_I_Emitter : Interfaces.IEmitter
     {
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
-            ctx.WriteLine("mov rax, [rbp + 16]");
+            ctx.WriteLine("pop rax");
+            ctx.WriteLine("movsxd rax, eax");
             ctx.WriteLine("push rax");
         }
     }
