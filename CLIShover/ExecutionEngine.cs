@@ -18,6 +18,7 @@ namespace CLIShover
                 return;
             }
             var asm = Assembly.LoadFile(filePath);
+            Logging log = new Logging();
             Console.WriteLine("IL → NASM translator");
 
             var emitters = InstructionEmitterRegistry.Create();
@@ -37,7 +38,6 @@ namespace CLIShover
 
                     if (method.Name == "Main")
                     {
-                        // Create a label for the method
                         context.AddLabel("main");
                     }
                     context.currentMethodName = method.Name;
@@ -54,6 +54,7 @@ namespace CLIShover
 
                     foreach (var instr in instructions)
                     {
+
                         instrucCount--;
                         if (instrucCount == 0)
                         {
@@ -64,15 +65,16 @@ namespace CLIShover
                         // Label handling (if any jumps point to this offset)
                         if (context.Labels.TryGetValue(instr.Offset, out var label))
                             context.Output.AppendLine($"{label}:");
+                             
 
                         if (emitters.TryGetValue(instr.OpCode, out var emitter))
                         {
-                            Debug.Print($"Emitting {instr.OpCode.Name} for {type.FullName}.{method.Name} at offset {instr.Offset:X4}");
+                            Logging.Log($"Emitting {instr.OpCode.Name} for {type.FullName}.{method.Name} at offset {instr.Offset:X4}", true);
                             emitter.Emit(instr, context);
                         }
                         else
                         {
-                            Logging.Logging.Log($"No emitter for opcode: {instr.OpCode}", false);
+                            Logging.Log($"No emitter for opcode: {instr.OpCode}", false);
                         }
                     }
                     context.WriteLine("");
@@ -81,12 +83,12 @@ namespace CLIShover
             // Dump generated NASM
             if (context.ToString().Length != 0)
             {
-                Logging.Logging.Log("Successfully generated NASM code to output.asm", true);
+                Logging.Log("Successfully generated NASM code to output.asm", true);
                 File.WriteAllText("output.asm", context.ToString());
             }
             else
             {
-                Logging.Logging.Log("No instructions generated.", false);
+                Logging.Log("No instructions generated.", false);
             }
         }
     }
