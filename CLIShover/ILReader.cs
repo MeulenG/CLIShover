@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Buffers.Binary;
 
 namespace CLIShover
 {
@@ -34,7 +35,7 @@ namespace CLIShover
             var instructions = new List<ILInstruction>();
 
             int pos = 0;
-            while (pos < il.Length)
+            while (pos < il?.Length)
             {
                 int offset = pos;
                 OpCode opcode;
@@ -48,15 +49,15 @@ namespace CLIShover
                 {
                     opcode = SingleByteOpCodes[code];
                 }
-
-                object? operand = ReadOperand(il, ref pos, opcode.OperandType);
+                Console.WriteLine($"Opcode: {opcode}, OperandType: {opcode.OperandType}, pos: {pos:X4}");
+                object? operand = ReadOperand(il, ref pos, opcode.OperandType, method, new ILInstruction { Offset = offset, OpCode = opcode });
                 instructions.Add(new ILInstruction { Offset = offset, OpCode = opcode, Operand = operand });
             }
 
             return instructions;
         }
 
-        private static object? ReadOperand(byte[] il, ref int pos, OperandType type)
+        private static object? ReadOperand(byte[] il, ref int pos, OperandType type, MethodInfo method, ILInstruction instr)
         {
             switch (type)
             {
@@ -87,10 +88,25 @@ namespace CLIShover
                     pos += 2;
                     return varIndex;
                 case OperandType.InlineString:
+                    int stringToken = BitConverter.ToInt32(il, pos);
+                    pos += 4;
+                    return method.Module.ResolveString(stringToken);
                 case OperandType.InlineField:
+                    int token = BinaryPrimitives.ReadInt32LittleEndian(il.AsSpan(pos));
+                    pos += 4;
+                    return method.Module.ResolveField(token);
                 case OperandType.InlineType:
+                    int typeToken = BitConverter.ToInt32(il, pos);
+                    pos += 4;
+                    return method.Module.ResolveType(typeToken);
                 case OperandType.InlineMethod:
+                    int methodToken = BitConverter.ToInt32(il, pos);
+                    pos += 4;
+                    return method.Module.ResolveMethod(methodToken);
                 case OperandType.InlineTok:
+                    int tokToken = BitConverter.ToInt32(il, pos);
+                    pos += 4;
+                    return method.Module.ResolveMember(tokToken);
                 case OperandType.InlineSig:
                     var metadataToken = BitConverter.ToInt32(il, pos);
                     pos += 4;

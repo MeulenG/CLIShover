@@ -1,34 +1,41 @@
 using System.Text;
 
-
 namespace CLIShover
 {
 
     public class EmitterContext
     {
-         public StringBuilder Output { get; } = new StringBuilder();
-    
-        public Dictionary<int, string> Labels { get; } = new(); // IL offset → label
-        public Stack<string> EvaluationStack { get; } = new();   // Simulated eval stack
-        public int LabelCounter { get; set; } = 0;
-
-        public string currentMethodName = string.Empty;
+        private StringBuilder _text = new();
+        private StringBuilder _data = new();
         
-        public void WriteLine(string line)
+        public Dictionary<int, string> Labels { get; } = new();
+        public Stack<string> EvaluationStack { get; } = new();
+        public int LabelCounter { get; set; } = 0;
+        public string CurrentMethodName = string.Empty;
+
+        public void WriteText(string line)
         {
-            Output.AppendLine("    " + line);
+            _text.AppendLine("    " + line);
         }
 
-        public string GetNewLabel()
+        public void WriteData(string line)
         {
-            return $"label_{LabelCounter++}";
+            _data.AppendLine(line);
         }
 
-        public void AddLabel(string methodName)
+        public string GetNewLabel() => $"label_{LabelCounter++}";
+
+        public void AddLabel(string methodName) => _text.AppendLine($"{methodName}:");
+
+        public string ToString()
         {
-            Output.AppendLine($"{methodName}:");
+            var sb = new StringBuilder();
+            sb.AppendLine("global main");
+            sb.AppendLine("section .data");
+            sb.Append(_data.ToString());
+            sb.AppendLine("section .text");
+            sb.Append(_text.ToString());
+            return sb.ToString();
         }
-        public override string ToString() => Output.ToString();
     }
-
 }
