@@ -4,10 +4,12 @@ namespace CLIShover.ILOpCodes
     {
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
-            ctx.WriteLine("pop rax");
-            ctx.WriteLine("pop rbx");
-            ctx.WriteLine("cmp rax, rbx");
-            ctx.WriteLine("jl " + instr.Label);
+            var right = ctx.EvaluationStack.Pop();
+            var left = ctx.EvaluationStack.Pop();
+
+            ctx.WriteText($"cmp {left}, {right}");
+
+            ctx.WriteText($"jl {instr.Label}");
         }
     }
 }

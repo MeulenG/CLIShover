@@ -4,8 +4,8 @@ namespace CLIShover.ILOpCodes
     {
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
-            ctx.WriteLine("mov rax, [rbp + 16]");
-            ctx.WriteLine("push rax");
+            ctx.WriteText("mov rax, rdi");
+            ctx.EvaluationStack.Push("rax"); // track value on our virtual stack
         }
     }
 }

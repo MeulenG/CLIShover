@@ -6,10 +6,12 @@ namespace CLIShover.ILOpCodes
     {
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
-            ctx.WriteLine("pop rax");
-            ctx.WriteLine("pop rbx");
-            ctx.WriteLine("add rax, rbx");
-            ctx.WriteLine("push rax");
+            var right = ctx.EvaluationStack.Pop();
+            var left  = ctx.EvaluationStack.Pop();
+
+            ctx.WriteText($"add {left}, {right}");
+
+            ctx.EvaluationStack.Push(left);
         }
     }
 }
