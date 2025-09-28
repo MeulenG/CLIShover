@@ -1,6 +1,6 @@
 .phony : all clean compile test
 
-all: compile test
+all: compile
 
 # Detect OS and arch
 OSFLAG := 
@@ -49,10 +49,10 @@ os:
 	echo "Operating System: $(OS)"
 	echo "Architecture: $(ARCHFLAG)"
 
-compiler:
+compile:
 	@echo "Compiling the project..."
-	dotnet build CLIShover/
-	dotnet run --project CLIShover/ClIShover.csproj
+	dotnet build IncroCompiler/
+	dotnet run --project IncroCompiler/IncroCompiler.csproj
 
 test:
 	@echo "Running tests..."
