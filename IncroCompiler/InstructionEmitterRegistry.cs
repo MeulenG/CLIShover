@@ -50,11 +50,13 @@ namespace IncroCompiler
                 { OpCodes.Ldarg_0,  new ILOpCodes.Ldarg_0_Emitter() },
                 { OpCodes.Call,     new ILOpCodes.Call_Emitter() },
                 // Pass classes dictionary to Callvirt_Emitter
-                { OpCodes.Callvirt, new ILOpCodes.Callvirt_Emitter(classes, intrinsics) },
+                { OpCodes.Callvirt, new ILOpCodes.Callvirt_Emitter() },
                 { OpCodes.Ldarg_1,  new ILOpCodes.Ldarg_1_Emitter() },
                 { OpCodes.Ceq,      new ILOpCodes.Ceq_Emitter() },
                 { OpCodes.Br_S,     new ILOpCodes.Br_S_Emitter() },
                 { OpCodes.Brfalse_S, new ILOpCodes.Brfalse_S_Emitter() }
+                , { OpCodes.Brtrue_S, new ILOpCodes.Brtrue_Emitter() }
+                , { OpCodes.Clt,      new ILOpCodes.Clt_Emitter() }
             };
         }
     }

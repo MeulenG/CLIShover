@@ -2,13 +2,13 @@ using System;
 using System.Reflection;
 namespace IncroCompiler.ILOpCodes
 {
-    public class Brfalse_S_Emitter : Interfaces.IEmitter
+    public class Brtrue_Emitter : Interfaces.IEmitter
     {
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
             if (!(instr.Operand is int targetOffset))
             {
-                ctx.WriteText("    ; brfalse.s missing target");
+                ctx.WriteText("; brtrue.s missing target");
                 return;
             }
 
@@ -18,7 +18,7 @@ namespace IncroCompiler.ILOpCodes
             string lbl = ctx.GetOrCreateLabel(ctx.CurrentMethodName, targetOffset);
 
             ctx.WriteText("cmp rax, 0");
-            ctx.WriteText($"je {lbl}");
+            ctx.WriteText($"jne {lbl}");
         }
     }
 }

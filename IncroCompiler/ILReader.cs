@@ -48,7 +48,6 @@ namespace IncroCompiler
                 {
                     opcode = SingleByteOpCodes[code];
                 }
-                Console.WriteLine($"Opcode: {opcode}, OperandType: {opcode.OperandType}, pos: {pos:X4}");
                 object? operand = ReadOperand(il, ref pos, opcode.OperandType, method, new ILInstruction { Offset = offset, OpCode = opcode });
                 instructions.Add(new ILInstruction { Offset = offset, OpCode = opcode, Operand = operand });
             }

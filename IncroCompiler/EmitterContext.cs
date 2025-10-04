@@ -5,12 +5,13 @@ namespace IncroCompiler
 
     public class EmitterContext
     {
-        private StringBuilder _text = new();
-        private StringBuilder _data = new();
-        public StringBuilder DataSection { get; } = new StringBuilder();
+        private readonly List<string> _dataLines = new List<string>();
+        private readonly List<string> _textLines = new List<string>();
+        private readonly Dictionary<(string Method, int Offset), string> _labels
+            = new Dictionary<(string, int), string>();
         public int StringCounter { get; set; } = 0;
         
-        public Dictionary<int, string> Labels { get; } = new();
+        public Dictionary<string, string> Labels = new Dictionary<string,string>();
         public Stack<string> EvaluationStack { get; } = new();
         public int LabelCounter { get; set; } = 0;
         public string CurrentMethodName = string.Empty;
@@ -37,29 +38,43 @@ namespace IncroCompiler
             return lbl;
         }
 
-        public void WriteText(string line)
-        {
-            _text.AppendLine("    " + line);
-        }
-
-        public void WriteData(string line)
-        {
-            _data.AppendLine(line);
-        }
-
         public string GetNewLabel() => $"label_{LabelCounter++}";
 
-        public void AddLabel(string methodName) => _text.AppendLine($"{methodName}:");
+        public string MakeLabelKey(string methodName, int offset) => $"{methodName}:{offset:X4}";
 
-        public string ToString()
+        public string GetOrCreateLabel(string methodName, int offset)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("global main");
-            sb.AppendLine("section .data");
-            sb.Append(_data.ToString());
-            sb.AppendLine("section .text");
-            sb.Append(_text.ToString());
-            return sb.ToString();
+            var key = MakeLabelKey(methodName, offset);
+            if (!Labels.TryGetValue(key, out var label))
+            {
+                label = $"{methodName}_L_{offset:X4}";
+                Labels[key] = label;
+            }
+            return label;
+        }
+
+        public bool TryGetLabel(string methodName, int offset, out string label)
+        {
+            return Labels.TryGetValue(MakeLabelKey(methodName, offset), out label);
+        }
+
+        public void AddLabel(string methodName, int offset, string labelName)
+        {
+            _labels[(methodName, offset)] = labelName;
+        }
+
+        public void WriteData(string line) => _dataLines.Add(line);
+        public void WriteText(string line) => _textLines.Add(line);
+
+        public string DataSection => string.Join(Environment.NewLine, _dataLines) + Environment.NewLine;
+        public override string ToString() => string.Join(Environment.NewLine, _textLines);
+
+        private static string Sanitize(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "M";
+            // allow alphanumerics and underscores
+            var arr = s.Select(c => (char.IsLetterOrDigit(c) || c == '_' ? c : '_')).ToArray();
+            return new string(arr);
         }
     }
 }

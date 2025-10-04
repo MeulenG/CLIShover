@@ -1,52 +1,41 @@
+using System;
 using System.Reflection;
 
 namespace IncroCompiler.ILOpCodes
 {
- public class Callvirt_Emitter : Interfaces.IEmitter
+    public class Callvirt_Emitter : Interfaces.IEmitter
     {
-        private readonly Dictionary<Type, ClassInfo> _classes;
-
-        // Optional: table of OS intrinsics
-        private readonly Dictionary<MethodInfo, Action<EmitterContext>> _intrinsics;
-
-        public Callvirt_Emitter(Dictionary<Type, ClassInfo> classes, Dictionary<MethodInfo, Action<EmitterContext>> intrinsics)
-        {
-            _classes = classes;
-            _intrinsics = intrinsics ?? new Dictionary<MethodInfo, Action<EmitterContext>>();
-        }
-
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
             if (!(instr.Operand is MethodInfo methodToCall))
-                throw new InvalidOperationException("Callvirt operand must be a MethodInfo.");
+                throw new InvalidOperationException("MissingMethodException: callvirt requires a MethodInfo operand");
 
-            var objectType = methodToCall.DeclaringType!;
-
-            if (_intrinsics.TryGetValue(methodToCall, out var impl))
+            var parameters = methodToCall.GetParameters();
+            for (int i = parameters.Length - 1; i >= 0; i--)
             {
-                impl(ctx);
-                return;
+                ctx.EvaluationStack.Pop();
             }
 
-            if (!_classes.TryGetValue(objectType, out var ci))
+            if (!methodToCall.IsStatic)
             {
-                ctx.WriteText($"; skipping callvirt to external type {objectType.FullName}");
-                return;
+                ctx.EvaluationStack.Pop();
             }
 
-            if (!ci.VTableSlots.TryGetValue(methodToCall, out int slot))
-                throw new InvalidOperationException($"Method {methodToCall.Name} not found in vtable for {objectType.Name}");
+            string methodLabel = $"{Sanitize(methodToCall.DeclaringType!.Name)}_{methodToCall.Name}_{methodToCall.MetadataToken:X}";
+            ctx.WriteText($"    ; callvirt {methodToCall.DeclaringType.FullName}::{methodToCall.Name}");
+            ctx.WriteText($"    call {methodLabel}");
 
-            ctx.WriteText("pop rdi                ; this pointer");
+            if (methodToCall.ReturnType != typeof(void))
+            {
+                ctx.EvaluationStack.Push("rax");
+            }
+        }
 
-            ctx.WriteText("test rdi, rdi");
-            ctx.WriteText("je __throw_nullref     ; throw if null");
-
-            ctx.WriteText("mov rax, [rdi]        ; load vtable pointer");
-            ctx.WriteText($"mov rax, [rax + {slot * 8}] ; load virtual method slot");
-            ctx.WriteText("call rax");
-
-            ctx.EvaluationStack.Push("rax");
+        private static string Sanitize(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "M";
+            var arr = s.Select(c => char.IsLetterOrDigit(c) || c == '_' ? c : '_').ToArray();
+            return new string(arr);
         }
     }
 }

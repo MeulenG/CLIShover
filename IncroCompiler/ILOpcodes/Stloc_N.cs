@@ -5,22 +5,15 @@ namespace IncroCompiler.ILOpCodes
 {
     public class Stloc_N_Emitter : Interfaces.IEmitter
     {
+        private int _slotSize = 8;
+
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
-            int idx = ExtractIndexFromOpCode(instr.OpCode);
-            int offset = StackLayoutHelper.GetLocalOffset(idx);
+            int idx = instr.Operand is int i ? i : 0;
+            int offset = 8 + idx * _slotSize;
             var v = ctx.EvaluationStack.Pop();
-            ctx.WriteText($"mov rax, {v}");
-            ctx.WriteText($"mov [rbp{offset}], rax");
+            if (v != "rax") ctx.WriteText($"mov rax, {v}");
+            ctx.WriteText($"mov [rbp-{offset}], rax");
         }
-
-        private static int ExtractIndexFromOpCode(OpCode opcode) => opcode.Name switch
-        {
-            "stloc.0" => 0,
-            "stloc.1" => 1,
-            "stloc.2" => 2,
-            "stloc.3" => 3,
-            _ => throw new NotSupportedException($"Unsupported opcode: {opcode}")
-        };
     }
 }

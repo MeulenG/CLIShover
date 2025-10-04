@@ -4,7 +4,16 @@ namespace IncroCompiler.ILOpCodes
     {
         public void Emit(ILInstruction instr, EmitterContext ctx)
         {
-            ctx.WriteText($"jmp {instr.Label}");
+            if (!(instr.Operand is int targetOffset))
+            {
+                ctx.WriteText("; br.s with no operand?");
+                return;
+            }
+
+            string label = ctx.GetOrCreateLabel(ctx.CurrentMethodName,targetOffset);
+
+            ctx.WriteText($"    jmp {label}");
         }
     }
+
 }
